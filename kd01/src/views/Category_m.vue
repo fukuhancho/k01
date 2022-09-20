@@ -7,9 +7,10 @@
     @current-change="handleCurrentChange" 
     >
     <el-table-column type="index" width="50" />
-    <el-table-column prop="branch_id" label="支部コード" width="180" />
-    <el-table-column prop="branch_nm" label="支部名" width="180" />
-    <el-table-column prop="branch_nm2" label="支部名（カナ）"   />
+    <el-table-column prop="category_id" label="カテゴリーコード" width="180" />
+    <el-table-column prop="category_nm" label="カテゴリー名" width="180" />
+    <el-table-column prop="filter_age" label="フィルタ（年齢）" width="180" />
+    <el-table-column prop="filter_phigicalindex" label="フィルタ（体力指数）"   />
   </el-table>
  
 
@@ -33,16 +34,19 @@
   </el-button>
 
 
-  <el-dialog v-model="dialogFormVisible" title="支部追加">
+  <el-dialog v-model="dialogFormVisible" title="カテゴリー追加">
     <el-form :model="form">
-      <el-form-item label="支部コード：" :label-width="formLabelWidth">
-        <el-input v-model="form.branch_id"  placeholder="Please input" clearable />
+      <el-form-item label="カテゴリーコード：" :label-width="formLabelWidth">
+        <el-input v-model="form.category_id"  placeholder="Please input" clearable />
       </el-form-item>
-      <el-form-item label="支部名：" :label-width="formLabelWidth">
-        <el-input v-model="form.branch_nm" placeholder="Please input" clearable />
+      <el-form-item label="カテゴリー名：" :label-width="formLabelWidth">
+        <el-input v-model="form.category_nm" placeholder="Please input" clearable />
       </el-form-item>
-      <el-form-item label="支部名（カナ）：" :label-width="formLabelWidth">
-        <el-input v-model="form.branch_nm2" placeholder="Please input" clearable />
+      <el-form-item label="フィルタ（年齢）：" :label-width="formLabelWidth">
+        <el-input v-model="form.filter_age" placeholder="Please input" clearable />
+      </el-form-item>
+      <el-form-item label="フィルタ（体力指数）：" :label-width="formLabelWidth">
+        <el-input v-model="form.filter_phigicalindex" placeholder="Please input" clearable />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -55,21 +59,23 @@
 
 </template>
 
-<script  lang="ts" >
+<script  lang="ts"  >
 import axios from 'axios'
 import { reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 
 const form = reactive({
-  branch_id: '',
-  branch_nm: '',
-  branch_nm2: '',
+  category_id: '',
+  category_nm: '',
+  filter_age: 0,
+  filter_phigicalindex: 0,
 })
 
 interface Recdata {
-    branch_id: string
-    branch_nm: string
-    branch_nm2: string
+    category_id: string
+    category_nm: string
+    filter_age : number
+    filter_phigicalindex : number
 }
 
 const currentRow = ref()
@@ -88,15 +94,16 @@ export default {
       tableData:[] as Recdata[],
       dialogFormVisible :false,
       form:{
-        branch_id: '',
-        branch_nm: '',
-        branch_nm2: '',
+        category_id: '',
+        category_nm: '',
+        filter_age: 0,
+        filter_phigicalindex: 0,
       },
       formLabelWidth : '140px',
     }
   },
   mounted() {
-    axios.get("http://192.168.101.21:1880/get-branch")
+    axios.get("http://192.168.101.21:1880/get-category")
     .then((response) => {
         response.data["data"].forEach((element: Recdata) => {
             this.tableData.push(element);
@@ -112,7 +119,7 @@ export default {
         currentRow.value = val;
       },
       onConfirm(){
-        axios.post("http://192.168.101.21:1880/add-branch",{
+        axios.post("http://192.168.101.21:1880/add-category",{
           form: this.form
         })
         .then((response) => {
@@ -126,7 +133,7 @@ export default {
 
       onSerch: function()  {
         this.tableData = [];
-        axios.get("http://192.168.101.21:1880/get-branch")
+        axios.get("http://192.168.101.21:1880/get-category")
           .then((response) => {
             response.data["data"].forEach((element: Recdata) => {
               this.tableData.push(element);
@@ -138,8 +145,8 @@ export default {
       },
 
       onDelete: function() {        
-        axios.post("http://192.168.101.21:1880/del-branch",{
-          branch_id: currentRow.value.branch_id
+        axios.post("http://192.168.101.21:1880/del-category",{
+          category_id: currentRow.value.category_id
         })
         .then((response) => {
           sucmsg();

@@ -18,7 +18,32 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/branch_m',
     name: 'branch_m',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Branch_m.vue')
+    component: () => import('../views/Branch_m.vue')
+  },
+  {
+    path: '/venue_m',
+    name: 'venue_m',
+    component: () => import('../views/Venue_m.vue')
+  },
+  {
+    path: '/tournament_m',
+    name: 'tounrament_m',
+    component: () => import('../views/Tournament_m.vue')
+  },
+  {
+    path: '/category_m',
+    name: 'category_m',
+    component: () => import('../views/Category_m.vue')
+  },
+  {
+    path: '/gameclass_m',
+    name: 'gameclass_m',
+    component: () => import('../views/Gameclass_m.vue')
+  },
+  {
+    path: '/player_m',
+    name: 'player_m',
+    component: () => import('../views/Player_m.vue')
   },
 ]
 

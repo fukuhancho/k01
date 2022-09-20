@@ -7,9 +7,9 @@
     @current-change="handleCurrentChange" 
     >
     <el-table-column type="index" width="50" />
-    <el-table-column prop="branch_id" label="支部コード" width="180" />
-    <el-table-column prop="branch_nm" label="支部名" width="180" />
-    <el-table-column prop="branch_nm2" label="支部名（カナ）"   />
+    <el-table-column prop="venue_id" label="会場コード" width="180" />
+    <el-table-column prop="venue_nm" label="会場名" width="180" />
+    <el-table-column prop="remarks" label="備考"   />
   </el-table>
  
 
@@ -33,16 +33,16 @@
   </el-button>
 
 
-  <el-dialog v-model="dialogFormVisible" title="支部追加">
+  <el-dialog v-model="dialogFormVisible" title="会場追加">
     <el-form :model="form">
-      <el-form-item label="支部コード：" :label-width="formLabelWidth">
-        <el-input v-model="form.branch_id"  placeholder="Please input" clearable />
+      <el-form-item label="会場コード：" :label-width="formLabelWidth">
+        <el-input v-model="form.venue_id"  placeholder="Please input" clearable />
       </el-form-item>
-      <el-form-item label="支部名：" :label-width="formLabelWidth">
-        <el-input v-model="form.branch_nm" placeholder="Please input" clearable />
+      <el-form-item label="会場名：" :label-width="formLabelWidth">
+        <el-input v-model="form.venue_nm" placeholder="Please input" clearable />
       </el-form-item>
-      <el-form-item label="支部名（カナ）：" :label-width="formLabelWidth">
-        <el-input v-model="form.branch_nm2" placeholder="Please input" clearable />
+      <el-form-item label="備考：" :label-width="formLabelWidth">
+        <el-input v-model="form.remarks" placeholder="Please input" clearable />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -55,21 +55,21 @@
 
 </template>
 
-<script  lang="ts" >
+<script  lang="ts"  >
 import axios from 'axios'
 import { reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 
 const form = reactive({
-  branch_id: '',
-  branch_nm: '',
-  branch_nm2: '',
+  venue_id: '',
+  venue_nm: '',
+  remarks: '',
 })
 
 interface Recdata {
-    branch_id: string
-    branch_nm: string
-    branch_nm2: string
+    venue_id: string
+    venue_nm: string
+    remarks : string
 }
 
 const currentRow = ref()
@@ -88,15 +88,15 @@ export default {
       tableData:[] as Recdata[],
       dialogFormVisible :false,
       form:{
-        branch_id: '',
-        branch_nm: '',
-        branch_nm2: '',
+        venue_id: '',
+        venue_nm: '',
+        remarks: '',
       },
       formLabelWidth : '140px',
     }
   },
   mounted() {
-    axios.get("http://192.168.101.21:1880/get-branch")
+    axios.get("http://192.168.101.21:1880/get-venue")
     .then((response) => {
         response.data["data"].forEach((element: Recdata) => {
             this.tableData.push(element);
@@ -112,7 +112,7 @@ export default {
         currentRow.value = val;
       },
       onConfirm(){
-        axios.post("http://192.168.101.21:1880/add-branch",{
+        axios.post("http://192.168.101.21:1880/add-venue",{
           form: this.form
         })
         .then((response) => {
@@ -126,7 +126,7 @@ export default {
 
       onSerch: function()  {
         this.tableData = [];
-        axios.get("http://192.168.101.21:1880/get-branch")
+        axios.get("http://192.168.101.21:1880/get-venue")
           .then((response) => {
             response.data["data"].forEach((element: Recdata) => {
               this.tableData.push(element);
@@ -138,8 +138,8 @@ export default {
       },
 
       onDelete: function() {        
-        axios.post("http://192.168.101.21:1880/del-branch",{
-          branch_id: currentRow.value.branch_id
+        axios.post("http://192.168.101.21:1880/del-venue",{
+          venue_id: currentRow.value.venue_id
         })
         .then((response) => {
           sucmsg();

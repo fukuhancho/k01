@@ -7,9 +7,11 @@
     @current-change="handleCurrentChange" 
     >
     <el-table-column type="index" width="50" />
-    <el-table-column prop="branch_id" label="支部コード" width="180" />
-    <el-table-column prop="branch_nm" label="支部名" width="180" />
-    <el-table-column prop="branch_nm2" label="支部名（カナ）"   />
+    <el-table-column prop="tournament_id" label="大会コード" width="180" />
+    <el-table-column prop="tournament_nm" label="大会名称" width="180" />
+    <el-table-column prop="dateofevent" label="開催日" width="180" />
+    <el-table-column prop="venue_nm" label="会場" width="180" />
+    <el-table-column prop="number_coat" label="コート数"   />
   </el-table>
  
 
@@ -33,16 +35,30 @@
   </el-button>
 
 
-  <el-dialog v-model="dialogFormVisible" title="支部追加">
+  <el-dialog v-model="dialogFormVisible" title="大会情報追加" draggable>
     <el-form :model="form">
-      <el-form-item label="支部コード：" :label-width="formLabelWidth">
-        <el-input v-model="form.branch_id"  placeholder="Please input" clearable />
+      <el-form-item label="大会コード：" :label-width="formLabelWidth">
+        <el-input v-model="form.tournament_id"  placeholder="Please input" clearable />
       </el-form-item>
-      <el-form-item label="支部名：" :label-width="formLabelWidth">
-        <el-input v-model="form.branch_nm" placeholder="Please input" clearable />
+      <el-form-item label="大会名称：" :label-width="formLabelWidth">
+        <el-input v-model="form.tournament_nm" placeholder="Please input" clearable />
       </el-form-item>
-      <el-form-item label="支部名（カナ）：" :label-width="formLabelWidth">
-        <el-input v-model="form.branch_nm2" placeholder="Please input" clearable />
+      <el-form-item label="開催日：" :label-width="formLabelWidth">
+        <el-date-picker v-model="form.dateofevent" type="date" placeholder="Pick a day"
+              format="YYYY/MM/DD" value-format="YYYY/MM/DD" />
+      </el-form-item>
+      <el-form-item label="会場名：" :label-width="formLabelWidth">
+        <el-select v-model="form.venue_id" placeholder="Please select" >
+          <el-option
+            v-for="item in selData"
+            :key="item.venue_id"
+            :label="item.venue_nm"
+            :value="item.venue_id"
+            />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="コート数：" :label-width="formLabelWidth">
+        <el-input v-model="form.number_coat" placeholder="Please input" clearable />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -55,22 +71,32 @@
 
 </template>
 
-<script  lang="ts" >
+<script  lang="ts"  >
 import axios from 'axios'
 import { reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 
 const form = reactive({
-  branch_id: '',
-  branch_nm: '',
-  branch_nm2: '',
+  tournament_id: '',
+  tournament_nm: '',
+  dateofevent: '',
+  venue_nm: '',
+  number_coat: 2,
 })
 
 interface Recdata {
-    branch_id: string
-    branch_nm: string
-    branch_nm2: string
+    tournament_id: string
+    tournament_nm: string
+    dateofevent : string
+    venue_nm : string
+    number_coat : number
 }
+
+interface Recdata2 {
+    venue_id: string
+    venue_nm: string
+}
+
 
 const currentRow = ref()
 
@@ -86,21 +112,29 @@ export default {
   data() {
     return {
       tableData:[] as Recdata[],
+      selData:[] as Recdata2[],
       dialogFormVisible :false,
       form:{
-        branch_id: '',
-        branch_nm: '',
-        branch_nm2: '',
+        tournament_id: '',
+        tournament_nm: '',
+        dateofevent : '',
+        venue_nm : '',
+        number_coat : 2,
       },
       formLabelWidth : '140px',
     }
   },
   mounted() {
-    axios.get("http://192.168.101.21:1880/get-branch")
+    axios.get("http://192.168.101.21:1880/get-tournament")
     .then((response) => {
         response.data["data"].forEach((element: Recdata) => {
             this.tableData.push(element);
         });
+
+        response.data["data2"].forEach((element: Recdata2) => {
+            this.selData.push(element);
+        });
+
     } )
     .catch((e) => {
         alert(e);
@@ -112,7 +146,7 @@ export default {
         currentRow.value = val;
       },
       onConfirm(){
-        axios.post("http://192.168.101.21:1880/add-branch",{
+        axios.post("http://192.168.101.21:1880/add-tournament",{
           form: this.form
         })
         .then((response) => {
@@ -126,7 +160,7 @@ export default {
 
       onSerch: function()  {
         this.tableData = [];
-        axios.get("http://192.168.101.21:1880/get-branch")
+        axios.get("http://192.168.101.21:1880/get-tournament")
           .then((response) => {
             response.data["data"].forEach((element: Recdata) => {
               this.tableData.push(element);
@@ -138,8 +172,8 @@ export default {
       },
 
       onDelete: function() {        
-        axios.post("http://192.168.101.21:1880/del-branch",{
-          branch_id: currentRow.value.branch_id
+        axios.post("http://192.168.101.21:1880/del-tournament",{
+          tournament_id: currentRow.value.tournament_id
         })
         .then((response) => {
           sucmsg();
